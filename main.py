@@ -1,14 +1,14 @@
 from fastapi import FastAPI, Depends, Request, Response
 from fastapi.responses import RedirectResponse, JSONResponse
 from gateway.api_router import call_api_gateway, RedirectStudentPortalException, RedirectAcademicManagementPortalException
-from controller import napne_system
+from controller import napne_portals
 from loguru import logger
 from uuid import uuid4
 
 
 app = FastAPI()
 
-app.include_router(napne_system.router, dependencies=[Depends(call_api_gateway)])
+app.include_router(napne_portals.router, dependencies=[Depends(call_api_gateway)])
 logger.add("info.log", format="Log: [{extra[log_id]}: {time} - {level} - {message}]", level="INFO", enqueue=True)
 
 @app.middleware("http")
