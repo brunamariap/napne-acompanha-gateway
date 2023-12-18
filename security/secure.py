@@ -2,10 +2,11 @@ from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 
-from models.data.sqlalchemy_models import Login
-from sqlalchemy.orm import Session
-from db_config.sqlalchemy_connect import sess_db
-from repository.login import LoginRepository
+from prisma.partials import UserAuthentication
+# from models.data.sqlalchemy_models import Login
+# from sqlalchemy.orm import Session
+# from db_config.sqlalchemy_connect import sess_db
+from repository.user import LoginRepository
 
 crypt_context = CryptContext(schemes=["sha256_crypt", "md5_crypt"])
 
@@ -17,9 +18,9 @@ def get_password_hash(password):
 def verify_password(plain_password, hashed_password):
     return crypt_context.verify(plain_password, hashed_password)
 
-def authenticate(username, password, account:Login):
+def authenticate(password, passphrase):
     try:
-        password_check = verify_password(password, account.passphrase)
+        password_check = verify_password(password, passphrase)
         return password_check
     except Exception as e:
         print(e)

@@ -1,15 +1,26 @@
 from fastapi import FastAPI, Depends, Request, Response
 from fastapi.responses import RedirectResponse, JSONResponse
 from gateway.api_router import call_api_gateway, RedirectStudentPortalException, RedirectAcademicManagementPortalException
-from controller import napne_portals
+from controller import napne_portals, authentication
 from loguru import logger
 from uuid import uuid4
-
+from prisma import Prisma
 
 app = FastAPI()
-
+app.include_router(authentication.router)
 app.include_router(napne_portals.router, dependencies=[Depends(call_api_gateway)])
+
 logger.add("info.log", format="Log: [{extra[log_id]}: {time} - {level} - {message}]", level="INFO", enqueue=True)
+
+prisma = Prisma(auto_register=True)
+
+@app.on_event("startup")
+def startup():
+    prisma.connect()
+
+@app.on_event("shutdown")
+def shutdown():
+    prisma.disconnect()
 
 @app.middleware("http")
 async def log_middleware(request: Request, call_next):

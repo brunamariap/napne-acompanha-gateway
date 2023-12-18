@@ -1,0 +1,26 @@
+// database
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider             = "prisma-client-py"
+    interface            = "sync"
+    recursive_type_depth = 5
+}
+
+enum Departments {
+    TEACHER
+    ADMINISTRATOR
+}
+
+model User {
+    id           String      @id @default(uuid())
+    name         String
+    registration String
+    password     String
+    passphrase   String
+    picture      String?
+    department   Departments
+}
