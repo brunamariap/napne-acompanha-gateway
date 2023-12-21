@@ -1,12 +1,17 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from repository.user import UserRepository
+from dotenv import load_dotenv
+from datetime import datetime, timedelta
+import os
 
-from prisma.partials import UserAuthentication
-# from models.data.sqlalchemy_models import Login
-# from sqlalchemy.orm import Session
-# from db_config.sqlalchemy_connect import sess_db
-from repository.user import LoginRepository
+load_dotenv()
+
+SECRET_KEY = os.environ.get("SECRET_PASSPHRASE")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 1
 
 crypt_context = CryptContext(schemes=["sha256_crypt", "md5_crypt"])
 
@@ -26,9 +31,36 @@ def authenticate(password, passphrase):
         print(e)
         return False
     
-def get_current_user(token: str = Depends(oauth2_scheme), sess:Session = Depends(sess_db) ):
-    loginrepo = LoginRepository(sess)
-    user = loginrepo.get_all_login_username(token)
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+
+    to_encode.update({ "exp": expire })
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    
+    return encoded_jwt
+
+def get_token_data(request: Request):
+    token = request.headers.get('authorization').split(" ")[1]
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    try:
+        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(decoded_token)
+        return decoded_token
+    except JWTError:
+        raise credentials_exception
+    
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    user_repository = UserRepository()
+    user = user_repository.get_by_registration(token)
     if user == None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

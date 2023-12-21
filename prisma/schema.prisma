@@ -20,7 +20,6 @@ model User {
     name         String
     registration String
     password     String
-    passphrase   String
     picture      String?
     department   Departments
 }

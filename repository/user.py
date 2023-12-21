@@ -14,7 +14,9 @@ class UserRepository:
         return self.repository.prisma().find_unique({'id': id})
     
     def get_by_registration(self, registration) -> User:
-        return self.repository.prisma().find_unique({ 'registration': registration })
+        return self.repository.prisma().find_first(where={
+            "registration": registration
+        })
 
     def change(self, id: str, request: UserRequest):
         return self.repository.prisma().update(data=request, where={'id': id})
