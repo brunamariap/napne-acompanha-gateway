@@ -1,12 +1,9 @@
-from fastapi import FastAPI, Depends, Request, Response, HTTPException, status
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi import FastAPI, Depends, Request, Response
+from fastapi.responses import RedirectResponse
 from gateway.api_router import call_api_gateway, RedirectStudentPortalException, RedirectAcademicManagementPortalException
 from controller import napne_portals, authentication
 from loguru import logger
-from uuid import uuid4
 from prisma import Prisma
-from security.secure import get_token_data
-from jose import JWTError
 
 app = FastAPI()
 app.include_router(authentication.router)
@@ -49,10 +46,9 @@ def shutdown():
 
 @app.exception_handler(RedirectStudentPortalException)
 def exception_handler_student(request: Request, exc: RedirectStudentPortalException) -> Response:
-    print('entrei aqui')
-    return RedirectResponse(url='http://localhost:8003/docs')
+    return RedirectResponse(url='http://localhost:8003'+request.url.path)
 
 
 @app.exception_handler(RedirectAcademicManagementPortalException)
 def exception_handler_academic_management(request: Request, exc: RedirectAcademicManagementPortalException) -> Response:
-    return RedirectResponse(url='http://localhost:8001/docs')
+    return RedirectResponse(url='http://localhost:8001'+request.url.path)

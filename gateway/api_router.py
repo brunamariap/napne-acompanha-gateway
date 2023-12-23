@@ -5,15 +5,14 @@ from fastapi import Request
 logger = logging.getLogger('uvicorn.access')
 
 def call_api_gateway(request: Request):
-    try:
-        portal_id = request.path_params['portal_id']
-
-        if portal_id == str(1):
-            raise RedirectStudentPortalException()
-        elif portal_id == str(2):
-            raise RedirectAcademicManagementPortalException()
-    except:
-        pass
+    
+    portal_id = request.path_params['portal_id']
+    request.scope["path"] = request.url.path.replace(f"/napne/{portal_id}", "")
+    
+    if portal_id == "student":
+        raise RedirectStudentPortalException()
+    elif portal_id == "academic":
+        raise RedirectAcademicManagementPortalException()
     
 
 class RedirectStudentPortalException(Exception):
