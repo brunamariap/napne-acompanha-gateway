@@ -5,6 +5,7 @@ from gateway.api_router import call_api_gateway, RedirectStudentPortalException,
 from controller import napne_portals, authentication
 from loguru import logger
 from prisma import Prisma
+import os
 
 app = FastAPI()
 
@@ -14,6 +15,9 @@ origins = [
     "http://localhost",
     "http://localhost:8080",
     "http://localhost:3000",
+    "https://napne.azurewebsites.net",
+    os.getenv("MS_STUDENT_URL"),
+    os.getenv("MS_ACACEMIC_MANAGEMENT_URL"),
 ]
 
 app.add_middleware(
@@ -65,9 +69,9 @@ def shutdown():
 
 @app.exception_handler(RedirectStudentPortalException)
 def exception_handler_student(request: Request, exc: RedirectStudentPortalException) -> Response:
-    return RedirectResponse(url='http://localhost:8003'+request.url.path)
+    return RedirectResponse(url=os.getenv("MS_STUDENT_URL") +request.url.path)
 
 
 @app.exception_handler(RedirectAcademicManagementPortalException)
 def exception_handler_academic_management(request: Request, exc: RedirectAcademicManagementPortalException) -> Response:
-    return RedirectResponse(url='http://localhost:8001'+request.url.path)
+    return RedirectResponse(url=os.getenv("MS_ACACEMIC_MANAGEMENT_URL")+request.url.path)
