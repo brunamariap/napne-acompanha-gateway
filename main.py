@@ -17,7 +17,7 @@ origins = [
     "http://localhost:3000",
     "https://napne.azurewebsites.net",
     os.getenv("MS_STUDENT_URL"),
-    os.getenv("MS_ACACEMIC_MANAGEMENT_URL"),
+    os.getenv("MS_ACADEMIC_MANAGEMENT_URL"),
 ]
 
 app.add_middleware(
@@ -74,4 +74,4 @@ def exception_handler_student(request: Request, exc: RedirectStudentPortalExcept
 
 @app.exception_handler(RedirectAcademicManagementPortalException)
 def exception_handler_academic_management(request: Request, exc: RedirectAcademicManagementPortalException) -> Response:
-    return RedirectResponse(url=os.getenv("MS_ACACEMIC_MANAGEMENT_URL")+request.url.path)
+    return RedirectResponse(url=os.getenv("MS_ACADEMIC_MANAGEMENT_URL")+request.url.path)
