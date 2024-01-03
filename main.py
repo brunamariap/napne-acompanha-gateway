@@ -16,6 +16,7 @@ origins = [
     "http://localhost:8080",
     "http://localhost:3000",
     "https://napne.azurewebsites.net",
+    "https://napne-acompanha.vercel.app",
     os.getenv("MS_STUDENT_URL"),
     os.getenv("MS_ACADEMIC_MANAGEMENT_URL"),
 ]
