@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from gateway.api_router import call_api_gateway, RedirectStudentPortalException, RedirectAcademicManagementPortalException
-from controller import napne_portals, authentication
+from controller import authentication, user
 from loguru import logger
 from prisma import Prisma
 import os
@@ -30,7 +30,7 @@ app.add_middleware(
 
 
 app.include_router(authentication.router)
-app.include_router(napne_portals.router, dependencies=[Depends(call_api_gateway)])
+app.include_router(user.router)
 
 logger.add("info.log", format="Log: [{extra[log_id]}: {time} - {level} - {message}]", level="INFO", enqueue=True)
 
